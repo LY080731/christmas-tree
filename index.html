@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圣诞树</title>
+<style>
+*{margin:0;padding:0}
+body{background:#000;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden}
+.tree{color:#0f0;font-size:14px;white-space:pre;text-align:center}
+.star{color:#ff0;font-size:20px}
+</style>
+</head>
+<body>
+<div class="tree">
+<span class="star">★</span>
+<br>
+   *
+  ***
+ *****
+*******
+  ***
+  ***
+  ***
+</div>
+<script>
+const s=['★','  *',' ***','*****','*******','  ***','  ***','  ***'];
+const el=document.querySelector('.tree');
+function twinkle(){
+    el.innerHTML=s.join('\n');
+    setTimeout(()=>el.innerHTML=s.map(x=>x.replace('*',' ')).join('\n'),300);
+}
+setInterval(twinkle,600);
+</script>
+</body>
+</html>
