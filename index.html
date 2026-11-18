@@ -2,35 +2,125 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>圣诞树</title>
 <style>
-*{margin:0;padding:0}
-body{background:#000;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden}
-.tree{color:#0f0;font-size:14px;white-space:pre;text-align:center}
-.star{color:#ff0;font-size:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#000;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+canvas{
+  display:block;
+  width:100%;
+  height:100%;
+}
 </style>
 </head>
 <body>
-<div class="tree">
-<span class="star">★</span>
-<br>
-   *
-  ***
- *****
-*******
-  ***
-  ***
-  ***
-</div>
+<canvas id="canvas"></canvas>
 <script>
-const s=['★','  *',' ***','*****','*******','  ***','  ***','  ***'];
-const el=document.querySelector('.tree');
-function twinkle(){
-    el.innerHTML=s.join('\n');
-    setTimeout(()=>el.innerHTML=s.map(x=>x.replace('*',' ')).join('\n'),300);
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+const BLACK = '#000000';
+const WHITE = '#ffffff';
+const RED = '#ff0000';
+const GREEN = '#00ff00';
+const BLUE = '#0000ff';
+const YELLOW = '#ffff00';
+const PINK = '#ffc0cb';
+const BROWN = '#8b4513';
+
+class Particle {
+  constructor(x, y, color, size = 1) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.size = size;
+    this.vx = (Math.random() - 0.5) * 2;
+    this.vy = (Math.random() - 0.5) * 2;
+    this.life = Math.floor(Math.random() * 100) + 100;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life--;
+    if (this.life <= 0) {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.life = Math.floor(Math.random() * 100) + 100;
+    }
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
 }
-setInterval(twinkle,600);
+
+function createTreeParticles() {
+  const particles = [];
+  const treeHeight = Math.min(200, height * 0.3);
+  const treeWidth = Math.min(150, width * 0.2);
+  const centerX = width / 2;
+  const centerY = height / 2 + 50;
+
+  for (let i = 0; i < treeHeight; i++) {
+    const layerWidth = Math.floor(treeWidth * (i / treeHeight));
+    for (let j = -layerWidth; j < layerWidth; j++) {
+      if (Math.random() < 0.3) {
+        const x = centerX + j;
+        const y = centerY - i;
+        const color = [GREEN, RED, BLUE, YELLOW, PINK][Math.floor(Math.random() * 5)];
+        particles.push(new Particle(x, y, color, Math.floor(Math.random() * 3) + 1));
+      }
+    }
+  }
+
+  for (let i = 0; i < 50; i++) {
+    const x = centerX + Math.floor(Math.random() * 40) - 20;
+    const y = centerY + i;
+    particles.push(new Particle(x, y, BROWN, 2));
+  }
+
+  for (let i = 0; i < 200; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    particles.push(new Particle(x, y, WHITE, Math.floor(Math.random() * 2) + 1));
+  }
+  return particles;
+}
+
+const particles = createTreeParticles();
+
+function animate() {
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(0,0,width,height);
+  particles.forEach(p=>{
+    p.update();
+    p.draw();
+  })
+  ctx.fillStyle="#fff";
+  ctx.font="bold 28px sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText("Merry Christmas", width/2, 45);
+  requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize',()=>{
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+})
 </script>
 </body>
 </html>
